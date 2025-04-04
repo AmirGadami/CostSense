@@ -14,39 +14,43 @@ CEILING_CHARS = MAX_TOKENS * 7
 
 class Item:
 
-    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL,trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, trust_remote_code=True)
     PREFIX = "Price is $"
-    QUESTION = "How much does this cost to the nearest dollar"
+    QUESTION = "How much does this cost to the nearest dollar?"
     REMOVALS = ['"Batteries Included?": "No"', '"Batteries Included?": "Yes"', '"Batteries Required?": "No"', '"Batteries Required?": "Yes"', "By Manufacturer", "Item", "Date First", "Package", ":", "Number of", "Best Sellers", "Number", "Product "]
-
 
     title: str
     price: float
     category: str
-    token_count: int =0
+    token_count: int = 0
     details: Optional[str]
     prompt: Optional[str] = None
     include = False
 
-    def __init__(self,data,price):
-        self.title  = data['title']
+    def __init__(self, data, price):
+        self.title = data['title']
         self.price = price
         self.parse(data)
 
     def scrub_details(self):
+        """
+        Clean up the details string by removing common text that doesn't add value
+        """
         details = self.details
         for remove in self.REMOVALS:
-            deatils = details.replace(remove,"")
+            details = details.replace(remove, "")
         return details
-    
-    def scrub(self,stuff):
 
-        stuff = re.sub(r'[:\[\]"{}【】\s]+' ,' ', stuff).strip()
+    def scrub(self, stuff):
+        """
+        Clean up the provided text by removing unnecessary characters and whitespace
+        Also remove words that are 7+ chars and contain numbers, as these are likely irrelevant product numbers
+        """
+        stuff = re.sub(r'[:\[\]"{}【】\s]+', ' ', stuff).strip()
         stuff = stuff.replace(" ,", ",").replace(",,,",",").replace(",,",",")
-        words = stuff.split(" ")
-        select = [word for word in words if len(word)<7 or not any(char.isdigit for char in word)]
+        words = stuff.split(' ')
+        select = [word for word in words if len(word)<7 or not any(char.isdigit() for char in word)]
         return " ".join(select)
-    
     def parse(self, data):
 
         contents = '\n'.join(data['description'])
@@ -67,7 +71,6 @@ class Item:
                 text = self.tokenizer.decode(tokens)
                 self.make_prompt(text)
                 self.include = True
-
 
     def make_prompt(self, text):
         self.prompt = f"{self.QUESTION}\n\n{text}\n\n"
