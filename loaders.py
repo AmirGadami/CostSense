@@ -31,7 +31,7 @@ class ItemLoader:
         except ValueError:
             return None
         
-        
+
     def from_chunk(self, chunk):
         
         batch = []
@@ -53,9 +53,13 @@ class ItemLoader:
     def load_in_parallel(self, workers):
 
 
-        result = []
+        results = []
         chunk_count = (len(self.dataset) // CHUNK_SIZE) + 1
         with ProcessPoolExecutor(max_workers = workers) as pool:
             for batch in tqdm(pool.map(self.from_chunk, self.chunk_generator())):
-                result.extend(batch)
+                results.extend(batch)
+
+        for result in results:
+            result.categorry = self.name
+
     
