@@ -36,7 +36,7 @@ class ItemLoader:
         
         batch = []
         for datapoint in chunk:
-            result = self.from_datapoint()
+            result = self.from_datapoint(datapoint)
             if result:
                 batch.append(result)
         return batch
@@ -56,12 +56,12 @@ class ItemLoader:
         results = []
         chunk_count = (len(self.dataset) // CHUNK_SIZE) + 1
         with ProcessPoolExecutor(max_workers = workers) as pool:
-            for batch in tqdm(pool.map(self.from_chunk, self.chunk_generator())):
+            for batch in tqdm(pool.map(self.from_chunk, self.chunk_generator()), totla=chunk_count):
                 results.extend(batch)
 
         for result in results:
-            result.categorry = self.name
-        return result
+            result.category = self.name
+        return results
     
 
 
