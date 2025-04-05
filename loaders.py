@@ -61,5 +61,16 @@ class ItemLoader:
 
         for result in results:
             result.categorry = self.name
-
+        return result
     
+
+
+    def load(self, workers=8):
+
+        start = datetime.now()
+        print(f"Loading dataset {self.name}", flush=True)
+        self.dataset = load_dataset("McAuley-Lab/Amazon-Reviews-2023", f"raw_meta_{self.name}", split="full", trust_remote_code=True)
+        results = self.load_in_parallel(workers)
+        finish = datetime.now()
+        print(f"Completed {self.name} with {len(results):,} datapoints in {(finish-start).total_seconds()/60:.1f} mins", flush=True)
+        return results
