@@ -56,7 +56,7 @@ class ItemLoader:
         results = []
         chunk_count = (len(self.dataset) // CHUNK_SIZE) + 1
         with ProcessPoolExecutor(max_workers = workers) as pool:
-            for batch in tqdm(pool.map(self.from_chunk, self.chunk_generator()), totla=chunk_count):
+            for batch in tqdm(pool.map(self.from_chunk, self.chunk_generator()), total=chunk_count):
                 results.extend(batch)
 
         for result in results:
