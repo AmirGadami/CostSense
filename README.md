@@ -1,17 +1,19 @@
 # 💸 CostSense
 
-**CostSense** is a fine-tuned GPT-based AI system that estimates the prices of consumer items based on textual descriptions. It leverages a Hugging Face dataset and OpenAI’s `gpt-4o-mini` model to deliver precise price predictions with no extra explanations—just numbers.
+**CostSense** is a fine-tuned AI system that estimates the prices of consumer items based on textual descriptions. It supports both **OpenAI’s `gpt-4o-mini`** and **Hugging Face LLaMA models fine-tuned with LoRA**, using a Hugging Face dataset and integrated experiment tracking with **Weights & Biases (wandb)**.
 
 ---
 
 ## 🚀 Features
 
 - 🧠 Fine-tuned on a **Hugging Face dataset** for realistic item pricing  
-- 🔬 Uses **OpenAI’s `gpt-4o-mini` (July 2024)** for high-quality predictions  
-- 🗃️ Automatic formatting to OpenAI-compatible JSONL  
-- 📦 Modular and reusable architecture with `Item` and `Tester` utilities  
-- 📈 Evaluation and visualizations for model performance  
-- 🧪 Weights & Biases integration for training tracking  
+- 🔬 Supports two fine-tuning tracks:
+  - **OpenAI’s `gpt-4o-mini`** via OpenAI API
+  - **LLaMA models** with **LoRA** using Hugging Face + PEFT  
+- 📊 Built-in **Weights & Biases integration** for experiment tracking  
+- 🗃️ Converts data to OpenAI-compatible JSONL format  
+- 📦 Modular architecture with `Item` and `Tester` utilities  
+- 📈 Model evaluation and comparison across approaches  
 
 ---
 
@@ -20,15 +22,16 @@
 ```bash
 .
 ├── gpt_model.ipynb              # Interactive testing of base or fine-tuned models
-├── fine_tuned_gpt.ipynb         # End-to-end fine-tuning workflow
-├── items.py                     # Item class: handles prompt formatting
+├── fine_tuned_gpt.ipynb         # Fine-tuning pipeline using OpenAI API
+├── lora_fine_tuned.ipynb        # Fine-tuning LLaMA models using Hugging Face + LoRA
+├── items.py                     # Item class for data structure and prompt formatting
 ├── loaders.py                   # Data loading from Hugging Face dataset
-├── testing.py                   # Performance metrics and evaluation
-├── environment.yml              # Conda environment definition
+├── testing.py                   # Performance metrics and result testing
+├── environment.yml              # Conda environment definition (name: llms)
 ├── train.pkl                    # Preprocessed training data
 ├── test.pkl                     # Preprocessed testing data
-├── fine_tune_train.jsonl        # Training data for OpenAI fine-tuning
-├── fine_tune_validation.jsonl   # Validation data for OpenAI fine-tuning
+├── fine_tune_train.jsonl        # OpenAI-ready training data
+├── fine_tune_validation.jsonl   # OpenAI-ready validation data
 ```
 
 ---
@@ -42,7 +45,7 @@ git clone https://github.com/yourusername/CostSense.git
 cd CostSense
 ```
 
-### 2. Create the Environment
+### 2. Create and Activate Environment
 
 ```bash
 conda env create -f environment.yml
@@ -51,35 +54,41 @@ conda activate llms
 
 ### 3. Set Environment Variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory with the following:
 
 ```env
 HF_TOKEN=your_huggingface_token
 OPENAI_API_KEY=your_openai_api_key
+WANDB_API_KEY=your_wandb_api_key
 ```
 
 ---
 
 ## 📊 Dataset
 
-CostSense uses a **Hugging Face dataset** containing item descriptions and ground truth prices. It is preprocessed and stored as `train.pkl` and `test.pkl`. You can easily replace it with your own dataset using the format defined in `items.py`.
+CostSense uses a **Hugging Face dataset** containing item descriptions and ground truth prices. It's preprocessed and stored in `train.pkl` and `test.pkl`. You can swap it with your own dataset using the `Item` format.
 
 ---
 
 ## 🧪 Fine-Tuning & Evaluation
 
-### Run the fine-tuning pipeline:
-- Load and split your dataset  
-- Convert to OpenAI's JSONL format  
-- Upload data via OpenAI's API  
-- Fine-tune using `gpt-4o-mini-2024-07-18`  
-- Retrieve your model and evaluate it on test items  
+### 🔁 Option 1: OpenAI GPT Fine-Tuning
 
-### Evaluate model accuracy:
+- Convert data to JSONL (`fine_tune_gpt.ipynb`)
+- Upload and fine-tune `gpt-4o-mini`
+- W&B tracking automatically integrated
+- Evaluate predictions:
 
 ```python
 Tester.test(gpt_fine_tuned, test)
 ```
+
+### 🦙 Option 2: LLaMA + LoRA (Hugging Face)
+
+- Use `lora_fine_tuned.ipynb` to fine-tune a LLaMA model
+- Leverage `PEFT`, `bitsandbytes`, and Hugging Face's trainer
+- Log metrics and results to W&B
+- Predict and evaluate using the shared interface
 
 ---
 
@@ -102,19 +111,20 @@ Price is $329.00
 ## 🧰 Tech Stack
 
 - **OpenAI** (`gpt-4o-mini`)
-- **Hugging Face Hub** (datasets, token management)
-- **Weights & Biases** (optional integration)
-- **Transformers**, **LangChain**, **Gradio**
-- **Python**, **Jupyter**, **FAISS**, **dotenv**
+- **Hugging Face Transformers** & **Datasets**
+- **LLaMA + LoRA** with **PEFT**
+- **Weights & Biases** for tracking and logging
+- **Python**, **Jupyter**, **FAISS**, **Gradio**
+- **dotenv**, **bitsandbytes**, **transformers**
 
 ---
 
 ## 🧠 Use Cases
 
 - E-commerce product valuation  
-- Retail market analysis  
-- Intelligent chatbots that estimate costs  
-- Pricing prediction for recommendation systems  
+- Retail analytics and forecasting  
+- AI chatbots that estimate item prices  
+- Educational demos of fine-tuning techniques  
 
 ---
 
